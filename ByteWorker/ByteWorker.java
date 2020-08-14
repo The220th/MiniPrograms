@@ -8,10 +8,14 @@ import java.security.NoSuchAlgorithmException;
 
 import java.math.BigInteger;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.*;
+
 /**
  * Класс, позволяющий удобн?о работать с массивом байт. Ни один из методов не "портит" аргументы
  * 
- * @version 0.1
+ * @version 0.2
  */
 public class ByteWorker
 {
@@ -610,11 +614,25 @@ public class ByteWorker
      * Переводит byte в unsigned byte, но в виде int
      * 
      * @param x - byte, где восьмой бит единица
-     * @return
+     * @return unsigned byte в виде int
      */
     public static int unsignedByte(byte x)
     {
-        return (x&ByteWorker.The8thBit)==0?x:x+256;
+        return (x&ByteWorker.The8thBit)==0?(int)x:(int)x+256;
+    }
+
+    /**
+     * Переводит unsigned byte, в виде int, в byte 
+     * 
+     * @param x - byte, где восьмой бит единица
+     * @return byte со знаком
+     * @throws IllegalArgumentException, если 0 > x или x >= 256
+     */
+    public static byte signedByte(int x) throws IllegalArgumentException
+    {
+        if(x < 0 || x >= 256)
+            throw new IllegalArgumentException("Byte can be only [0; 255], you gave: " + x);
+        return x < 128?(byte)x:(byte)(x-256);
     }
 
     /**
@@ -788,6 +806,100 @@ public class ByteWorker
             else
                 res[j] = a[i];
         }
+        return res;
+    }
+
+    /**
+     * Режет массив байт a на 2 массива. Первый с 0 до endFirst включительно, второй с beginSecond до a.length включительно
+     * 
+     * @param a - массив байт, который разделяется
+     * @param endFirst - конец первого массива
+     * @param beginSecond - начало второго массива
+     * @return массив массивов байт, где res[0][] - первый массив, а res[1][] - второй
+     */
+    public static byte[][] cutInto2(byte[] a, int endFirst, int beginSecond)
+    {
+        byte[][] res = new byte[2][];
+        res[0] = new byte[endFirst + 1];
+        res[1] = new byte[a.length - beginSecond];
+        int i, j;
+        for(i = 0, j = 0; j < res[0].length; i++, j++)
+            res[0][j] = a[i];
+        for(j = 0, i = beginSecond; j < res[1].length; i++, j++)
+            res[1][j] = a[i];
+        return res;
+    }
+
+    /**
+     * Записывает в поток out байты из target так, чтобы их можно было восстановить. Используйте метод ByteWorker.readNextBytes
+     * 
+     * @param out - поток, куда записывается target
+     * @param target - массив, байт, который нужно записать в поток
+     * @throws IOException, если какая-то проблема с out
+     */
+    public static void writeNextBytes(OutputStream out, byte[] target) throws IOException
+    {
+        /*
+        Пример как записывать:
+        ...
+        try(OutputStream fout = new FileOutputStream("res"))
+        {
+            byte[] test1 = ByteWorker.randomDeArray(13);
+            byte[] test2 = ByteWorker.randomDeArray(5);
+            byte[] test3 = ByteWorker.randomDeArray(7);
+            System.out.println("1: " + ByteWorker.forPrint(test1) + "\n2: " + ByteWorker.forPrint(test2) + "\n3: " + ByteWorker.forPrint(test3) + "\n");
+            ByteWorker.writeNextBytes(fout, test1);
+            ByteWorker.writeNextBytes(fout, test2);
+            ByteWorker.writeNextBytes(fout, test3);
+        }
+        catch(Throwable  e)
+        {
+            e.printStackTrace();
+        }
+        ...
+         */
+        out.write(ByteWorker.Int2Bytes(target.length));
+        out.write(target);
+    }
+
+    /**
+     * Считывает из потока in следующий массив байт. Записывать в поток массивы байт нужно с помощью метода ByteWorker.writeNextBytes
+     * 
+     * @param in - поток, из которого считываются байты
+     * @return массив байт, которые считались из in
+     * @throws IOException, если какая-то проблема с in
+     */
+    public static byte[] readNextBytes(InputStream in) throws IOException
+    {
+        /*
+        Пример как считывать:
+        ... // из потока из примера в методе ByteWorker.writeNextBytes
+        try(InputStream fin = new FileInputStream("res"))
+        {
+            byte[] res1 = ByteWorker.readNextBytes(fin);
+            byte[] res2 = ByteWorker.readNextBytes(fin);
+            byte[] res3 = ByteWorker.readNextBytes(fin);
+            System.out.println("1: " + ByteWorker.forPrint(res1) + "\n2: " + ByteWorker.forPrint(res2) + "\n3: " + ByteWorker.forPrint(res3) + "\n");
+        }
+        catch(Throwable e)
+        {
+            e.printStackTrace();
+        }
+        ...
+         */
+        int i, j;
+        int bufff;
+        byte[] buff = new byte[Integer.BYTES];
+        for(i = 0; i < buff.length; i++)
+        {
+            bufff = in.read();
+            if(bufff == -1)
+                return null;
+            buff[i] = ByteWorker.signedByte(bufff);
+        }
+        byte[] res = new byte[ByteWorker.Bytes2Int(buff)];
+        for(i = 0; i < res.length; i++)
+            res[i] = ByteWorker.signedByte( in.read() );
         return res;
     }
 }
