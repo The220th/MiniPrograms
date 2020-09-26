@@ -15,7 +15,7 @@ public class MapGenerator
     private float defect;
     public static void main(String[] args)
     {
-        MapGenerator mg = new MapGenerator((short)6, (short)15, (short)0, 0.1f);
+        MapGenerator mg = new MapGenerator((short)11, (short)15, (short)0, 0.1f);
         short[][] a = mg.genMap();
         PrintMap(a);
     }
@@ -184,7 +184,7 @@ public class MapGenerator
 
         buff = (short)((l/worldMap.length)*res*defect*r.nextFloat() + 0.5);
         buff *= r.nextBoolean()?1:-1;
-        res += buff;
+        //res += buff;
         if(res > maxH) res = maxH;
         if(res < 0) res = 0;
         return res;
