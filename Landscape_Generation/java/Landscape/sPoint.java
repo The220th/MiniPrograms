@@ -1,5 +1,7 @@
 package Landscape;
 
+import java.util.Random;
+
 /**
  * Должно гарантироваться, что изменить точку нельзя
  */
@@ -55,5 +57,17 @@ public class sPoint
     public String toString()
     {
         return "(" + this.x + ", " + this.y + ")";
+    }
+
+    /**
+     * Включительно всё
+     */
+    public static sPoint rndPoint(short min, short max)
+    {
+        Random r = new Random();
+        int x = r.nextInt(max-min+1) + min;
+        int y = r.nextInt(max-min+1) + min;
+        sPoint res = new sPoint((short)x, (short)y);
+        return res;
     }
 }

@@ -8,6 +8,7 @@ import java.awt.*;
 import java.awt.geom.*;
 
 import Landscape.MapGenerator;
+import Landscape.TownGenerator;
 
 public class GUI
 {
@@ -28,7 +29,7 @@ class sFrame extends JFrame
 {
     public sFrame()
     {
-        this.add(new JScrollPane(new sComponent(11, 4)));
+        this.add(new JScrollPane(new sComponent(10, 2)));
         this.pack();
     }
 }
@@ -46,6 +47,8 @@ class sComponent extends JComponent
         sizeble = Sizeble;
         MapGenerator mg = new MapGenerator((short)(pow2), maxH, (short)2, 0.5f);
         map = mg.genMap();
+        TownGenerator tg = (new TownGenerator(map, 7));
+        tg.addTowns();
         /*Scanner in = new Scanner(System.in);
         map = new short[16][16];
         for(int i = 0; i < map.length; i++)
@@ -101,6 +104,13 @@ class sComponent extends JComponent
             return new Color(235, 235, 240); // Снег
         if(a == 15)
             return new Color(189, 193, 242); // Лёд
+
+        if(a == 101)
+            return new Color(26, 24, 22); // Город
+        if(a == 102 )
+            return new Color(255, 183, 0); // Центр города
+        if(a == 103)
+            return new Color(/*117, 93, 30*//*74, 74, 74*/184, 132, 0); // Дорога между городами
         return Color.BLACK;
     }
 
