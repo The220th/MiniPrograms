@@ -28,7 +28,7 @@ class sFrame extends JFrame
 {
     public sFrame()
     {
-        this.add(new JScrollPane(new sComponent(1048 + 1, 1048 + 1, 1)));
+        this.add(new JScrollPane(new sComponent(11, 4)));
         this.pack();
     }
 }
@@ -41,13 +41,19 @@ class sComponent extends JComponent
     private final short maxH = 15;
     short[][] map;
     
-    public sComponent(int w, int h, int Sizeble)
+    public sComponent(int pow2, int Sizeble)
     {
-        DEFAULT_WIDTH = w*Sizeble;
-        DEFAULT_HEIGHT = h*Sizeble;
         sizeble = Sizeble;
-        MapGenerator mg = new MapGenerator((short)(10), maxH, (short)2, 0.8f);
+        MapGenerator mg = new MapGenerator((short)(pow2), maxH, (short)2, 0.5f);
         map = mg.genMap();
+        /*Scanner in = new Scanner(System.in);
+        map = new short[16][16];
+        for(int i = 0; i < map.length; i++)
+            for(int j = 0; j < map[i].length; j++)
+                map[i][j] = in.nextShort();*/
+        
+        DEFAULT_WIDTH = map.length*Sizeble;
+        DEFAULT_HEIGHT = map.length*Sizeble;
     }
 
     public void paintComponent(Graphics gOld)

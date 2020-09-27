@@ -15,7 +15,7 @@ public class MapGenerator
     private float defect;
     public static void main(String[] args)
     {
-        MapGenerator mg = new MapGenerator((short)11, (short)15, (short)0, 0.1f);
+        MapGenerator mg = new MapGenerator((short)4, (short)15, (short)0, 0.1f);
         short[][] a = mg.genMap();
         PrintMap(a);
     }
@@ -80,21 +80,21 @@ public class MapGenerator
         {
             s = new sSquare(new sPoint((short)0, (short)0), l);
             d = new sDiamond(new sPoint((short)(l/2), (short)0), (short)(l/2));
-            //PrintMap(worldMap);
+            //PrintMap(worldMap); //Debug
             do
             {
-                //System.out.println(s);
+                //System.out.println(s); //Debug
                 squarePhase(s, l);
                 s = nextSquare(s, l);
-                //PrintMap(worldMap);
+                //PrintMap(worldMap); //Debug
             }while(s != null);
 
             do
             {
-                //System.out.println(d);
+                //System.out.println(d); //Debug
                 diamondPhase(d, l);
                 d = nextDiamond(d, (short)(l/2));
-                //PrintMap(worldMap);
+                //PrintMap(worldMap); //Debug
             }while(d != null);
             l = (short)(l/2);
         }while(l > 1);
@@ -120,6 +120,8 @@ public class MapGenerator
 
     private void set(sPoint p, short value)
     {
+        if(value > maxH) value = maxH;
+        if(value < 0) value = 0;
         worldMap[p.getY()][p.getX()] = value;
     }
 
@@ -181,12 +183,17 @@ public class MapGenerator
         short res, buff;
         Random r = new Random();
         res = (short)((x1+x2+x3+x4) / 4);
+        /*Govno
+        //buff = (short)((l/worldMap.length)*res*defect*r.nextFloat() + 0.5);
+        //buff *= r.nextBoolean()?1:-1;
+        //buff = (short)(r.nextBoolean()==true ? r.nextInt(l*getSize()+1) : -r.nextInt(l*getSize()+1));
+        */
 
-        buff = (short)((l/worldMap.length)*res*defect*r.nextFloat() + 0.5);
-        buff *= r.nextBoolean()?1:-1;
-        //res += buff;
-        if(res > maxH) res = maxH;
-        if(res < 0) res = 0;
+        /*Почти
+        buff = (short)(((l/worldMap.length)*res*defect*r.nextFloat() + 1.37) * (r.nextBoolean()?1:-1));*/
+
+        buff = (short)((r.nextInt() % l)*defect * (r.nextBoolean()?1:-1));
+        res += buff;
         return res;
     }
 
