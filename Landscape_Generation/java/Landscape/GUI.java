@@ -111,6 +111,8 @@ class sComponent extends JComponent
             return new Color(255, 183, 0); // Центр города
         if(a == 103)
             return new Color(/*117, 93, 30*//*74, 74, 74*/184, 132, 0); // Дорога между городами
+        if(a == 104)
+            return new Color(56, 56, 56);
         return Color.BLACK;
     }
 

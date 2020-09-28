@@ -11,6 +11,7 @@ public class TownGenerator
     private short townCenter = 102;
     private short townBlock = 101;
     private short roadBlock = 103;
+    private short townWall = 104;
 
     private sPoint[] towns;
     private short maxR = (short)15;
@@ -113,16 +114,9 @@ public class TownGenerator
         for(int i = 0; i < towns.length-1; i++)
             for(int j = i+1; j < towns.length; j++)
                 printLine(towns[i], towns[j]);
-
         for(int i = 0; i < towns.length; i++)
-        {
-            int buffR = r.nextInt(maxR - minR+1) + minR;
-            for(int j = 1; j <= buffR; j++)
-            {
-                printCircle(towns[i], (short)j, townBlock);
-            }
-            setBlock(towns[i], townCenter);
-        }
+            setTown(towns[i]);
+        
     }
 
     private void setBlock(sPoint p, short value)
@@ -141,13 +135,24 @@ public class TownGenerator
         for(int i = LU.getX(); i <= p.getX() + roadR; i++)
             for(int j = LU.getY(); j <= p.getY() + roadR; j++)
                 setBlock(new sPoint((short)i, (short)j), roadBlock);
+    }
 
+    private void setTown(sPoint where)
+    {
+        int j;
+        Random r = new Random();
+        int buffR = r.nextInt(maxR - minR+1) + minR;
+        for(j = 1; j < buffR; j++)
+        {
+            printCircleIn(where, (short)j, townBlock);
+        }
+        printCircle(where, (short)j, townWall);
+        setBlock(where, townCenter);
     }
 
     private void genTownsCoordinates()
     {
         int i;
-        Random r = new Random();
         for(i = 0; i < towns.length; i++)
             towns[i] = null;
         for(i = 0; i < towns.length; i++)
@@ -174,6 +179,59 @@ public class TownGenerator
         return true;
     }
 
+    private boolean[][] primAlg()
+    {
+        int next;
+        int i, j;
+        boolean[][] res = new boolean[towns.length][towns.length];
+        for(i = 0; i < res.length; i++)
+            for(j = 0; j < res.length; j++)
+                res[i][j] = false;
+        do
+        {
+            i =
+            next = findMinWay();
+        }while(!stopPrimAlg);
+        return res;
+    }
+
+    private int findMinWay(int town, boolean[][] a)
+    {
+        float min = Short.MAX_VALUE; //=(
+        int res = -1;
+        for(int i = 0; i < towns.length; i++)
+        {
+            if(i != town && a[town][i] == false && min > countS(town, i))
+            {
+                min = countS(town, i);
+                res = i;
+            }
+
+        }
+        return res;
+    }
+    private boolean stopPrimAlg(boolean[][] a)
+    {
+        int i, j;
+        boolean f;
+        for(i = 0; i < a.length; i++)
+        {
+            for(j = 0, f = false; j < a[i].length && !f; j++)
+                if(i != j && a[i][j] == true)
+                    f = true;
+            if(f == false)
+                return false;
+        }
+        return true;
+    }
+
+    private float countS(int town1, int town2)
+    {
+        sPoint p1 = towns[town1];
+        sPoint p2 = towns[town2];
+        return Math.sqrt( (p1.getX() - p2.getX())*(p1.getX() - p2.getX())+(p1.getY() - p2.getY())*(p1.getY() - p2.getY()) );
+    }
+
     private void printCircle(sPoint center, short r, short block)
     {
         // r - радиус, X1, Y1 - координаты центра
@@ -190,6 +248,56 @@ public class TownGenerator
             setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)), block);
             setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)), block);
             setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)), block);
+            error = 2 * (delta + y) - 1;
+            if ((delta < 0) && (error <= 0))
+            {
+                delta += 2 * ++x + 1;
+                continue;
+            }
+            if ((delta > 0) && (error > 0))
+            {
+                delta -= 2 * --y + 1;
+                continue;
+            }
+            delta += 2 * (++x - --y);
+        }
+    }
+
+    private void printCircleIn(sPoint center, short r, short block)
+    {
+        // r - радиус, X1, Y1 - координаты центра
+        //System.out.println("Circle: " + center + ", r = " + r); // Debug
+        int x = 0;
+        int y = r;
+        int X1 = center.getX();
+        int Y1 = center.getY();
+        int delta = 1 - 2 * r;
+        int error = 0;
+        while (y >= 0)
+        {
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 + y)), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 + y)).addX((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 + y)).addY((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 + y)).subX((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 + y)).subY((short)1), block);
+
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)).addX((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)).addY((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)).subX((short)1), block);
+            setBlock(new sPoint((short)(X1 + x), (short)(Y1 - y)).subY((short)1), block);
+
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)).addX((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)).addY((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)).subX((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 + y)).subY((short)1), block);
+
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)).addX((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)).addY((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)).subX((short)1), block);
+            setBlock(new sPoint((short)(X1 - x), (short)(Y1 - y)).subY((short)1), block);
             error = 2 * (delta + y) - 1;
             if ((delta < 0) && (error <= 0))
             {
