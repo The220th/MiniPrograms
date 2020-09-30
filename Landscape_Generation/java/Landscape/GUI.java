@@ -16,10 +16,11 @@ public class GUI
     {
         EventQueue.invokeLater( () ->
         {
-            var frame = new sFrame();
+            sFrame frame = new sFrame();
             frame.setTitle("Landscape");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
+            frame.setSize(1280, 720);
         }
         );
     }
@@ -47,7 +48,7 @@ class sComponent extends JComponent
         sizeble = Sizeble;
         MapGenerator mg = new MapGenerator((short)(pow2), maxH, (short)2, 0.5f);
         map = mg.genMap();
-        TownGenerator tg = (new TownGenerator(map, 7));
+        TownGenerator tg = (new TownGenerator(map, 100)).roadR(0);
         tg.addTowns();
         /*Scanner in = new Scanner(System.in);
         map = new short[16][16];

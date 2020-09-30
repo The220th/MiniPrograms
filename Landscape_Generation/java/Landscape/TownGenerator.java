@@ -14,8 +14,8 @@ public class TownGenerator
     private short townWall = 104;
 
     private sPoint[] towns;
-    private short maxR = (short)15;
-    private short minR = (short)4;
+    private short maxR = (short)7;
+    private short minR = (short)1;
     private short minS = (short)50;
     private short maxS = (short)1024;
     private short roadR = (short)1;
@@ -111,9 +111,12 @@ public class TownGenerator
         //Не забыть, что сначала "рисуются" дороги, потом город, потом центр
         genTownsCoordinates();
         
+        boolean[][] adjacencyMatrix = calculateRoads();
         for(int i = 0; i < towns.length-1; i++)
             for(int j = i+1; j < towns.length; j++)
-                printLine(towns[i], towns[j]);
+                if(adjacencyMatrix[i][j] == true)
+                    printLine(towns[i], towns[j]);
+        
         for(int i = 0; i < towns.length; i++)
             setTown(towns[i]);
         
@@ -163,6 +166,7 @@ public class TownGenerator
                 buffP = sPoint.rndPoint((short)0, (short)(map.length-1));
             }while(!checkLegalTownCoordinates(buffP));
             towns[i] = buffP;
+            //System.out.println("towns[" + i + "] = " + towns[i]); //Debug
         }
     }
 
@@ -179,39 +183,71 @@ public class TownGenerator
         return true;
     }
 
-    private boolean[][] primAlg()
+    private boolean[][] calculateRoads()
     {
-        int next;
-        int i, j;
         boolean[][] res = new boolean[towns.length][towns.length];
-        for(i = 0; i < res.length; i++)
-            for(j = 0; j < res.length; j++)
+        //Заполнить false`ами
+        for(int i = 0; i < res.length; i++)
+            for(int j = 0; j < res[i].length; j++)
                 res[i][j] = false;
+        
+        List<Integer> visited = new LinkedList<Integer>();
+        sPoint mins;
+        visited.add(Integer.valueOf(0));
         do
         {
-            i =
-            next = findMinWay();
-        }while(!stopPrimAlg);
+            mins = primAlg(-1, 0, visited, res);
+            res[mins.getX()][mins.getY()] = true;
+            res[mins.getY()][mins.getX()] = true;
+            visited.add(Integer.valueOf(mins.getY()));
+            //System.out.println(visited); //Debug
+        }while(!stopPrimAlg(visited));
         return res;
     }
 
-    private int findMinWay(int town, boolean[][] a)
+    /**
+     * 
+     * @param where - Из какой точки (города) вызвана функция. -1 = из никакого (начало)
+     * @param target - для какой точки (города) вызвана функия
+     * @param visited - список "посещенных" точек (городов)
+     * @return sPoint в данном слумае - это sPoint.x = первый город, а sPoint.y = второй город, которые нужно соединить
+     */
+    private sPoint primAlg(int where, int target, List<Integer> visited, boolean[][] adjacencyMatrix)
     {
-        float min = Short.MAX_VALUE; //=(
+        sPoint buff;
+        sPoint res = new sPoint((short)target, (short)findMinWay(target, visited));
+        for(int i = 0; i < towns.length; i++)
+            if(i != where && i != target && adjacencyMatrix[target][i] == true/* && visited.contains(Integer.valueOf(i))*/)
+            {
+                buff = primAlg(target, i, visited, adjacencyMatrix);
+                if(countS(res.getX(), res.getY()) > countS(buff.getX(), buff.getY()))
+                    res = buff;
+            }
+        return res;
+    }
+
+    private int findMinWay(int town, List<Integer> visited)
+    {
+        double min = Short.MAX_VALUE; //=(
         int res = -1;
         for(int i = 0; i < towns.length; i++)
         {
-            if(i != town && a[town][i] == false && min > countS(town, i))
+            if(i != town && !visited.contains(Integer.valueOf(i)) && min > countS(town, i))
             {
                 min = countS(town, i);
                 res = i;
             }
-
         }
+        //System.out.println("For towns[" + town + "] --- towns[" + res + "]"); // Debug
         return res;
     }
-    private boolean stopPrimAlg(boolean[][] a)
+    private boolean stopPrimAlg(/*boolean[][] a*/List<Integer> visited)
     {
+        if(visited.size() == towns.length)
+            return true;
+        else
+            return false;
+        /*
         int i, j;
         boolean f;
         for(i = 0; i < a.length; i++)
@@ -222,10 +258,10 @@ public class TownGenerator
             if(f == false)
                 return false;
         }
-        return true;
+        return true;*/
     }
 
-    private float countS(int town1, int town2)
+    private double countS(int town1, int town2)
     {
         sPoint p1 = towns[town1];
         sPoint p2 = towns[town2];
