@@ -58,7 +58,7 @@ class sComponent extends JComponent
         int k;
         double res = 0;
 
-        res += 0.5*Math.PI*Math.PI*(1.0/12.0); //a0 ("а нулевое")
+        res += 0.5*Math.PI*Math.PI*(1.0/12.0); //a0/2 ("а нулевое"/2)
         for (k = 1; k <= N_SINCOS; ++k) // 1 <= k <= N
         {
             res += ((Math.pow(-1, k))/(2*k*k))*Math.cos(2*k*x); //Часть с косинусом
@@ -71,7 +71,7 @@ class sComponent extends JComponent
         int k;
         double res = 0;
 
-        res += 0.5*Math.PI*Math.PI*(1.0/12.0); //a0 ("а нулевое")
+        res += 0.5*Math.PI*Math.PI*(1.0/12.0); //a0/2 ("а нулевое"/2)
         for(k = 1; k <= N_COS; ++k) // 1 <= k <= N
             res += ((Math.PI*Math.sin(0.5*k*Math.PI))/(2*k) + (2*Math.cos(0.5*k*Math.PI))/(k*k) - (4*Math.sin(0.5*k*Math.PI))/(Math.PI*k*k*k))*Math.cos(k*x); //Часть с косинусом
         return res;
