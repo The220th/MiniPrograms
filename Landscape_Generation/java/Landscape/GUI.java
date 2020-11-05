@@ -30,7 +30,7 @@ class sFrame extends JFrame
 {
     public sFrame()
     {
-        this.add(new JScrollPane(new sComponent(10, 2)));
+        this.add(new JScrollPane(new sComponent(11, 4)));
         this.pack();
     }
 }
@@ -40,15 +40,15 @@ class sComponent extends JComponent
     private int DEFAULT_WIDTH;
     private int DEFAULT_HEIGHT;
     private int sizeble;
-    private final short maxH = 15;
+    private final short maxH = 99;
     short[][] map;
     
     public sComponent(int pow2, int Sizeble)
     {
         sizeble = Sizeble;
-        MapGenerator mg = new MapGenerator((short)(pow2), maxH, (short)2, 0.5f);
+        MapGenerator mg = new MapGenerator((short)(pow2), maxH, (short)2, 5f);
         map = mg.genMap();
-        TownGenerator tg = (new TownGenerator(map, 100)).roadR(0);
+        TownGenerator tg = (new TownGenerator(map, 75)).roadR(1).minR(2);
         tg.addTowns();
         /*Scanner in = new Scanner(System.in);
         map = new short[16][16];
@@ -75,6 +75,37 @@ class sComponent extends JComponent
 
     public Color getBlock(short a)
     {
+        if(a < 10)
+            return new Color(0, 6, 92); // Глубокая водичка
+        if(a < 20)
+            return Color.BLUE; // Синяя водичка
+        if(a < 25)
+            return Color.CYAN; // Голубая водичка
+        if(a < 30)
+            return Color.YELLOW; // Пляжный песочек
+        if(a < 40)
+            return new Color(92, 91, 15); // Темный песочек
+        if(a < 50)
+            return new Color(112, 62, 9); // Земля коричневенькая
+        if(a < 55)
+            return Color.GREEN; // Зеленая трава
+        if(a < 60)
+            return new Color(86, 138, 10); // Не такая зеленая трава
+        if(a < 70)
+            return new Color(0, 61, 3); //Темненькая земля
+        if(a < 75)
+            return new Color(116, 138, 10); // Бесплодная земля
+        if(a < 80)
+            return new Color(63, 64, 57); // Скала
+        if(a < 85)
+            return new Color(79, 79, 76); // Скала повыше
+        if(a < 90)
+            return new Color(195, 197, 217); // Мокрый снег
+        if(a < 95)
+            return new Color(235, 235, 240); // Снег
+        if(a < 100)
+            return new Color(189, 193, 242); // Лёд
+        /*
         if(a == 0)
             return new Color(0, 6, 92); // Глубокая водичка
         if(a == 1)
@@ -104,7 +135,7 @@ class sComponent extends JComponent
         if(a == 14)
             return new Color(235, 235, 240); // Снег
         if(a == 15)
-            return new Color(189, 193, 242); // Лёд
+            return new Color(189, 193, 242); // Лёд*/
 
         if(a == 101)
             return new Color(26, 24, 22); // Город
