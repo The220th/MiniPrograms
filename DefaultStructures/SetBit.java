@@ -8,7 +8,6 @@ import java.util.*;
  */
 public class SetBit
 {
-    /*Тесты*/
     private int n;
     private int oneCell;
 
@@ -16,6 +15,7 @@ public class SetBit
 
     private int[] a;
 
+    /*Тесты*/
     public static void main(String[] args)
     {
         int N = 100000;
